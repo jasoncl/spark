@@ -314,8 +314,11 @@ class SQLContext(object):
             schema = struct
 
         elif isinstance(schema, StructType):
-            for row in data:
+            schema_names = [f.name for f in schema.fields]
+            for i, row in enumerate(data):
                 _verify_type(row, schema)
+                if hasattr(row,'__fields__') and row.__fields__ is not schema_names:
+                    data.__setitem__(i,[row[name] for name in schema_names])
 
         else:
             raise TypeError("schema should be StructType or list or None, but got: %s" % schema)

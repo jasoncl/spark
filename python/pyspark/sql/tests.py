@@ -1212,6 +1212,15 @@ class SQLTests(ReusedPySparkTestCase):
         self.assertEqual(df.schema.simpleString(), "struct<value:int>")
         self.assertEqual(df.collect(), [Row(key=i) for i in range(100)])
 
+    def test_kwargs_row_order(self):
+        schema = StructType([
+            StructField("pid", StringType()),
+            StructField("name", StringType())])
+        df = self.sqlCtx.createDataFrame([Row(pid="1",name="a"),Row("2","b")], schema)
+        row = df.select('*').first()
+        self.assertEqual("1", row[0])
+        self.assertEqual("a", row[1])
+
 
 class HiveContextSQLTests(ReusedPySparkTestCase):
 
